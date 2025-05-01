@@ -1,0 +1,18 @@
+{
+    "user1": {
+        "name": "John",
+        "location": {
+            "name": "Chandler, AZ",
+            "lat": 33.3062,
+            "lon": -111.8413
+        }
+    },
+    "user2": {
+        "name": "Jane",
+        "location": {
+            "name": "Phoenix, AZ",
+            "lat": 33.4484,
+            "lon": -112.0740
+        }
+    }
+}
