@@ -1,5 +1,5 @@
 import cv2
-from src.face_detection.hailo_face_detector import HailoFaceDetector
+from face_detection.hailo_face_detector import HailoFaceDetector
 
 # Load a test image
 frame = cv2.imread("camera_test.jpg")  # Make sure this file exists
