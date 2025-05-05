@@ -12,19 +12,23 @@ def test_model_loading():
     infer_model = vdevice.create_infer_model(hef_path)
 
     print("⚙️  Configuring model with default params...")
-    configured_model = infer_model.configure()  # No args
+    configured_model = infer_model.configure()
+    configured_model.create_bindings()
 
-    print("🔌 Getting input/output stream infos...")
-    input_infos = configured_model.get_input_vstream_infos()
-    output_infos = configured_model.get_output_vstream_infos()
+    input_vstream = configured_model.input_vstreams[0]
+    output_vstream = configured_model.output_vstreams[0]
 
-    print("📥 Allocating dummy input...")
-    dummy_input = np.zeros(input_infos[0].shape, dtype=np.uint8)
+    print("📥 Preparing dummy input...")
+    input_shape = input_vstream.get_frame_shape()
+    dummy_input = np.zeros(input_shape, dtype=np.uint8)
 
-    print("▶️ Running inference...")
-    results = configured_model.infer([dummy_input])
+    print("▶️ Sending dummy input...")
+    input_vstream.send(dummy_input)
 
-    print("✅ Inference complete. Output shape:", results[0].shape)
+    print("📤 Receiving output...")
+    output = output_vstream.recv()
+
+    print("✅ Inference complete. Output shape:", output.shape)
 
 if __name__ == "__main__":
     test_model_loading()

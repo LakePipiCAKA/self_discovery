@@ -101,45 +101,54 @@ These methods do **not exist** in the current `pyhailort` version extracted from
 - Still awaiting confirmed reference usage from working tutorial
 
 ### ✅ Validated Folder Tree (as of May 4)
+# Devlog Update - Project Structure Overview
+
+As part of the ongoing development of the `self_discovery` project, here's the current directory structure (up to 5 levels deep) to document the organization of code, models, and tests. This snapshot was generated using `tree -L 5` from the project root:
+
 ```bash
-~/self_discovery
-├── gui/
+.
+├── gui
 │   └── Main_App_Launch.py
+├── hailort.1.log
 ├── hailort.log
 ├── LICENSE
-├── models/
-│   └── hailo/
-│       └── yolov5s_personface_h8l.hef -> /usr/share/hailo-models/yolov5s_personface_h8l.hef
-├── notebooks/
+├── models
+│   └── hailo
+│       └── yolov5s_personface_h8l.hef
+├── notebooks
 │   ├── devlog.md
 │   ├── overview.md
 │   └── setup.ipynb
 ├── README.md
 ├── requirements.txt
-├── src/
-│   ├── camera/
+├── src
+│   ├── camera
 │   │   ├── camera_interface.py
-│   │   └── __pycache__/
-│   ├── face_detection/
+│   │   └── __pycache__
+│   │       └── camera_interface.cpython-311.pyc
+│   ├── face_detection
 │   │   ├── hailo_face_detector.py
-│   │   ├── __pycache__/
-│   │   ├── test_face_detector.py
-│   │   └── test_hailo.py
-│   ├── ui/
+│   │   ├── hailo_runtime.py
+│   │   └── __pycache__
+│   │       └── hailo_face_detector.cpython-311.pyc
+│   ├── ui
 │   │   ├── default.py
 │   │   ├── monitoring_display.py
 │   │   ├── recognition.py
 │   │   ├── selection.py
 │   │   └── training.py
-│   ├── user_management/
+│   ├── user_management
 │   │   ├── user_profiles.json
 │   │   └── user_profiles.py
-│   └── weather/
+│   └── weather
 │       └── open_meteo.py
-└── tests/
-    ├── import_hailo_platform.py
+└── tests
     ├── test_basic_camera.py
-    └── test_detector.py
-```
+    ├── test_face_detector.py
+    ├── test_hailort.py
+    └── test_inference.py
 
----
+14 directories, 27 files
+```
+### Progres Update May 4th 2025
+# Inferences works, hailor API works 
