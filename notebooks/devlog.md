@@ -55,7 +55,7 @@
 
 ---
 
-## ❌ Current Blocker
+## Resolved
 
 Script `import_hailo_platform.py` attempts to use high-level `InferModel` helpers:
 - `.input_streams`
@@ -152,3 +152,43 @@ As part of the ongoing development of the `self_discovery` project, here's the c
 ```
 ### Progres Update May 4th 2025
 # Inferences works, hailor API works 
+```
+```
+### Face Detection Static Image Test — May 4, 2025
+
+- Added `test_from_static_image()` to `hailo_face_detector.py`
+- Image used for test: `/home/taran/self_discovery/tests/Smart Mirror Camera Feed_screenshot_04.05.2025.png`
+- Tested both `.hef` models:
+  - `yolov5s_personface_h8l.hef`
+  - `yolov5s_face_h8l.hef`
+- Preprocessing steps applied:
+  - Resize to expected input shape
+  - BGR → RGB color conversion
+  - Normalization and reshaping to `[1, H, W, C]`
+- Output consistently returned shape `(1, 2, 0, 5)` → **No detections**
+
+#### ⚠️ Current Blocker
+
+- Output tensor has unexpected shape: `(1, 2, 0, 5)`
+- `InferVStreams` returns empty results
+- Parser fails with: "inhomogeneous shape after 2 dimensions"
+
+#### 🔍 Diagnosis Summary
+
+- Confirmed PiSP uses RGB888 format
+- Test image lighting consistent with working live detection scripts
+- Input preprocessing matches Hailo documentation
+- Still fails to produce detections across both `.hef` models
+
+#### 🧭 Next Steps
+
+1. ✅ Port structure from `HRT_0_Async_Inference_Tutorial.ipynb` into this project
+2. 🧪 Try alternate `.hef` models bundled with SDK demos
+3. 🔄 Revisit and log `input_info.name`, shape, and expected layout (NCHW/NHWC)
+4. 🧹 Option: Switch to OpenCV-based detection temporarily for profile creation
+
+---
+
+Resuming next time with streamlined flow from tested Hailo async inference tutorial.
+
+```

@@ -64,9 +64,9 @@ The `user_management/` module handles the creation, storage, and retrieval of us
 Located in: `src/face_detection/`
 
 #### 📁 Files:
-- `hailo_face_detector.py`: Main interface to Hailo `.hef` model using `pyhailort`
+- `hailo_face_detector.py`: Main interface to Hailo `.hef` model using `hailo-platform`
 - `test_face_detector.py`: Script to test face detection pipeline
-- `test_hailo.py`: Used to verify Hailo SDK installation and functionality
+- `test_hailo_model.py`: Used to verify Hailo Platform installation and functionality
 
 #### 🧩 Role:
 - Loads face detection model from `models/hailo/`
