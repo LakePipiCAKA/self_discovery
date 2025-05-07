@@ -1,0 +1,56 @@
+[2025-05-06 12:19:09.194] [113176] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2025-05-06 12:19:09.206] [113176] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-05-06 12:19:09.208] [113176] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-05-06 12:19:09.208] [113176] [HailoRT] [info] [vdevice.cpp:651] [create] VDevice Infos: 0001:01:00.0
+[2025-05-06 12:19:09.334] [113176] [HailoRT] [info] [internal_buffer_manager.cpp:204] [print_execution_results] Planned internal buffer memory: CMA memory 0, user memory 1969664. memory to edge layer usage factor is 1
+[2025-05-06 12:19:09.334] [113176] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
+[2025-05-06 12:19:09.350] [113176] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 21.378964 milliseconds
+[2025-05-06 12:19:09.350] [113176] [HailoRT] [info] [vdevice.cpp:749] [configure] Configuring HEF on VDevice took 21.687168 milliseconds
+[2025-05-06 12:19:09.353] [113176] [HailoRT] [info] [core_op.cpp:156] [activate] Activating yolov5s_personface took 0.381944 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2025-05-06 12:19:09.353] [113176] [HailoRT] [info] [core_op.cpp:156] [activate] Activating yolov5s_personface took 0.406704 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2025-05-06 12:19:09.353] [113176] [HailoRT] [info] [edge_elements.cpp:52] [create] Created (HwWriteEl0yolov5s_personface/input_layer1 | hw_frame_size: 1228800)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [queue_elements.cpp:284] [create] Created (PushQEl0yolov5s_personface/input_layer1 | timeout: 10s)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [filter_elements.cpp:101] [create] Created (PreInferEl0yolov5s_personface/input_layer1 | Reorder - src_order: NHWC, src_shape: (640, 640, 3), dst_order: NHCW, dst_shape: (640, 640, 3))
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [vstream.cpp:754] [InputVStreamImpl] Creating yolov5s_personface/input_layer1...
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [vstream_builder.cpp:102] [create_inputs] Input pipeline 'yolov5s_personface/input_layer1': (PreInferEl0yolov5s_personface/input_layer1 | Reorder - src_order: NHWC, src_shape: (640, 640, 3), dst_order: NHCW, dst_shape: (640, 640, 3)) >> (PushQEl0yolov5s_personface/input_layer1 | timeout: 10s) >> (HwWriteEl0yolov5s_personface/input_layer1 | hw_frame_size: 1228800) >> HW
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [multi_io_elements.cpp:135] [create] Created (NmsPPMuxEl0YOLOv5-Post-Process | Op YOLOV5, Name: YOLOv5-Post-Process, Score threshold: 0.200, IoU threshold: 0.60, Classes: 2, Cross classes: false, NMS results order: BY_CLASS, Max bboxes per class: 80, Image height: 640, Image width: 640)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [edge_elements.cpp:287] [create] Created (HwReadEl2yolov5s_personface/conv55_106 | hw_frame_size: 134400)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [queue_elements.cpp:657] [create] Created (PullQEl_nms2yolov5s_personface/conv55_106 | timeout: 10s)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [edge_elements.cpp:287] [create] Created (HwReadEl0yolov5s_personface/conv63_106 | hw_frame_size: 33600)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [queue_elements.cpp:657] [create] Created (PullQEl_nms0yolov5s_personface/conv63_106 | timeout: 10s)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [edge_elements.cpp:287] [create] Created (HwReadEl1yolov5s_personface/conv70_106 | hw_frame_size: 10080)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [queue_elements.cpp:657] [create] Created (PullQEl_nms1yolov5s_personface/conv70_106 | timeout: 10s)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [queue_elements.cpp:800] [create] Created (UserBufQEl_post_infer0yolov5s_personface/yolov5_nms_postprocess | timeout: 10s)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [vstream.cpp:1114] [OutputVStreamImpl] Creating yolov5s_personface/yolov5_nms_postprocess...
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [info] [vstream_builder.cpp:622] [create_output_post_process_nms] Output pipeline 'yolov5s_personface/yolov5_nms_postprocess': HW >> (HwReadEl2yolov5s_personface/conv55_106 | hw_frame_size: 134400) >> (PullQEl_nms2yolov5s_personface/conv55_106) >> (HwReadEl0yolov5s_personface/conv63_106 | hw_frame_size: 33600) >> (PullQEl_nms0yolov5s_personface/conv63_106) >> (HwReadEl1yolov5s_personface/conv70_106 | hw_frame_size: 10080) >> (PullQEl_nms1yolov5s_personface/conv70_106) >> (NmsPPMuxEl0YOLOv5-Post-Process | Op YOLOV5, Name: YOLOv5-Post-Process, Score threshold: 0.200, IoU threshold: 0.60, Classes: 2, Cross classes: false, NMS results order: BY_CLASS, Max bboxes per class: 80, Image height: 640, Image width: 640) >> (UserBufQEl_post_infer0yolov5s_personface/yolov5_nms_postprocess | timeout: 10s)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [error] [inference_pipeline.cpp:274] [verify_memory_view_size] CHECK failed - Memory size of vstream yolov5s_personface/input_layer1 does not match the frame count! (Expected 1509949440000, got 1228800)
+[2025-05-06 12:19:09.354] [113176] [HailoRT] [error] [inference_pipeline.cpp:201] [infer] CHECK_SUCCESS failed with status=HAILO_INVALID_ARGUMENT(2)
+[2025-05-06 12:19:09.358] [113193] [HailoRT] [info] [vdevice_native_stream.cpp:331] [read_impl] Failed read from stream HAILO_STREAM_ABORT(63) (device: 0001:01:00.0)
+[2025-05-06 12:19:09.358] [113191] [HailoRT] [info] [vdevice_native_stream.cpp:331] [read_impl] Failed read from stream HAILO_STREAM_ABORT(63) (device: 0001:01:00.0)
+[2025-05-06 12:19:09.358] [113193] [HailoRT] [info] [edge_elements.cpp:396] [run_pull] Reading from stream was aborted!
+[2025-05-06 12:19:09.358] [113191] [HailoRT] [info] [edge_elements.cpp:396] [run_pull] Reading from stream was aborted!
+[2025-05-06 12:19:09.358] [113192] [HailoRT] [info] [vdevice_native_stream.cpp:331] [read_impl] Failed read from stream HAILO_STREAM_ABORT(63) (device: 0001:01:00.0)
+[2025-05-06 12:19:09.358] [113192] [HailoRT] [info] [edge_elements.cpp:396] [run_pull] Reading from stream was aborted!
+[2025-05-06 12:19:09.358] [113191] [HailoRT] [info] [queue_elements.cpp:738] [run_in_thread] run_pull of queue element PullQEl_nms2yolov5s_personface/conv55_106 was aborted!
+[2025-05-06 12:19:09.358] [113193] [HailoRT] [info] [queue_elements.cpp:738] [run_in_thread] run_pull of queue element PullQEl_nms1yolov5s_personface/conv70_106 was aborted!
+[2025-05-06 12:19:09.358] [113192] [HailoRT] [info] [queue_elements.cpp:738] [run_in_thread] run_pull of queue element PullQEl_nms0yolov5s_personface/conv63_106 was aborted!
+[2025-05-06 12:19:09.358] [113194] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element UserBufQEl_post_infer0yolov5s_personface/yolov5_nms_postprocess is not running anymore, exiting..
+[2025-05-06 12:19:09.358] [113176] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element UserBufQEl_post_infer0yolov5s_personface/yolov5_nms_postprocess has 0 frames in his Queue on destruction
+[2025-05-06 12:19:09.358] [113193] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PullQEl_nms1yolov5s_personface/conv70_106 is not running anymore, exiting..
+[2025-05-06 12:19:09.358] [113176] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PullQEl_nms1yolov5s_personface/conv70_106 has 0 frames in his Queue on destruction
+[2025-05-06 12:19:09.358] [113192] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PullQEl_nms0yolov5s_personface/conv63_106 is not running anymore, exiting..
+[2025-05-06 12:19:09.358] [113176] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PullQEl_nms0yolov5s_personface/conv63_106 has 0 frames in his Queue on destruction
+[2025-05-06 12:19:09.358] [113191] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PullQEl_nms2yolov5s_personface/conv55_106 is not running anymore, exiting..
+[2025-05-06 12:19:09.358] [113176] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PullQEl_nms2yolov5s_personface/conv55_106 has 0 frames in his Queue on destruction
+[2025-05-06 12:19:09.358] [113190] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PushQEl0yolov5s_personface/input_layer1 is not running anymore, exiting..
+[2025-05-06 12:19:09.358] [113176] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PushQEl0yolov5s_personface/input_layer1 has 0 frames in his Queue on destruction
+[2025-05-06 12:19:09.358] [113176] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.404833 ms
+[2025-05-06 12:19:09.358] [113176] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.414852 ms
+[2025-05-06 13:08:57.955] [114966] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2025-05-06 13:08:57.956] [114966] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-05-06 13:08:57.957] [114966] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-05-06 13:08:57.979] [114966] [HailoRT] [error] [vdevice.cpp:820] [create_devices] CHECK failed - Failed to create vdevice. there are not enough free devices. requested: 1, found: 0
+[2025-05-06 13:08:57.980] [114966] [HailoRT] [error] [vdevice.cpp:631] [create] CHECK_SUCCESS failed with status=HAILO_OUT_OF_PHYSICAL_DEVICES(74)
+[2025-05-06 13:08:57.980] [114966] [HailoRT] [error] [shared_resource_manager.hpp:81] [register_resource] CHECK_SUCCESS failed with status=HAILO_OUT_OF_PHYSICAL_DEVICES(74)
+[2025-05-06 13:08:57.980] [114966] [HailoRT] [error] [vdevice.cpp:132] [create] CHECK_SUCCESS failed with status=HAILO_OUT_OF_PHYSICAL_DEVICES(74)
+[2025-05-06 13:08:57.980] [114966] [HailoRT] [error] [vdevice.cpp:554] [create] CHECK_SUCCESS failed with status=HAILO_OUT_OF_PHYSICAL_DEVICES(74)

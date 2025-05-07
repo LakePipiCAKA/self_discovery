@@ -187,8 +187,163 @@ As part of the ongoing development of the `self_discovery` project, here's the c
 3. 🔄 Revisit and log `input_info.name`, shape, and expected layout (NCHW/NHWC)
 4. 🧹 Option: Switch to OpenCV-based detection temporarily for profile creation
 
----
+```
 
 Resuming next time with streamlined flow from tested Hailo async inference tutorial.
 
 ```
+#### PHASE 1: Clean-Up & Minor Refactors
+# Confirm directory consistency
+
+- Ensure data/users/ will be the default place for user image data, profile images, health snapshots, etc.
+
+- Keep src/user_management/user_profiles.json as the user index (you already use this for metadata).
+
+# Refactor filenames for clarity (no logic change yet)
+
+- Rename hailo_face_detector_flat.py → hailo_face_detector_display.py if it's only for display/debug use.
+
+- Rename default.py in ui/ → welcome.py or start_screen.py (matches behavior).
+
+- Consider merging monitoring_display.py, recognition.py, and selection.py if they're small and used only for profile interaction. If not, leave as is.
+
+# Update README and overview.md accordingly
+-------------------------------------- A little housekeeping-----------------------------
+#### PHASE 2: Logic Isolation & Safety
+# Split model load logic
+
+Move the HailoFaceDetector initialization logic into a helper in face_detection/__init__.py to avoid repetition and future risk.
+
+Add logging inside the class for better debugging (self.logger = logging.getLogger(...) if needed).
+
+# Consolidate weather logic
+
+Move get_weather() from main_app_launch.py into weather/open_meteo.py and import it.
+
+#### PHASE 3: Main App Improvements (lightweight)
+# Implement "no user → prompt create user" logic
+
+On startup, check if user_profiles.json is empty or contains only defaults.
+
+If no user: show prompt with button: “Create new user” and bring up name/location input fields (can be a QDialog or added view).
+
+This can be done inside update_time_weather() or as a one-time check during __init__().
+
+# Store profile photos
+
+On new user creation or detection, create folder under data/users/<username>/
+
+Save detection snapshot (face image) with timestamp.
+
+Plan a retention policy (e.g., one image per day max, or overwrite).
+
+#### PHASE 4: Future (but simple) Additions
+# Enable health tracking placeholder
+
+Add a method stub in user_analysis/track_changes.py with def analyze_face_history(user_id) returning mock values (e.g., “No change”).
+
+Later plug in OpenCV-based comparison or ML skin detection.
+
+# Prepare SQLite fallback (optional)
+
+If JSON grows painful, convert user_profiles.json logic to sqlite3 with same schema (name, location, photo paths).
+
+Not needed now, but structure things to make switch painless.
+----------------------------------- House Keeping ends -----------------------------------
+
+#### 2025-05-06 — Face Detection, User Creation Prompt, and Project Cleanup
+# System Status:
+
+- App launches successfully from main_app_launch.py.
+
+- PyQt5 GUI displays camera feed, time, and weather.
+
+- Hailo-accelerated face detection confirmed active via green bounding boxes.
+
+- User-facing labels update based on presence/absence of face.
+
+# Major Progress:
+
+✅ Integrated face-based presence detection in main_app_launch.py.
+
+✅ Camera blur activates when no face detected.
+
+✅ Added greeting label toggle between "👋 Hello there!" and "😴 Waiting for face...".
+
+✅ JSON-based user registration logic implemented using user_profiles.json.
+
+✅ Automatic prompt for new user creation when no valid registered users found.
+
+✅ Cleaned up old fake profiles by filtering on "registered": true flag.
+
+✅ Updated and validated user_profiles.py functions (load_profiles, save_profile).
+
+✅ Resolved Qt plugin crash during GUI launch caused by system config mismatch.
+
+✅ Confirmed use of HailoFaceDetector (not OpenCV/CPU fallback).
+
+# Refactoring / Structure:
+
+- Reviewed current folder tree and preserved all working scripts.
+
+- Agreed on deferred full cleanup until core flow is functional.
+
+- user_profiles.json now expected to contain "registered": true for valid users.
+
+# Next Priorities:
+
+ - Implement logic to recognize existing faces and map them to registered users.
+
+ - Offer greeting with user name when recognized.
+
+ - Begin saving facial snapshots with date and metadata under /data/users/{username}/.
+
+ - Update GUI to show image history (simple left/right nav).
+
+ - Begin preparing user_analysis scaffolding for future weight/skin tracking.
+
+------------------------------------------------------------------------
+#### Additional for 5/6
+
+# ✅ Major Progress Today
+
+- main_app_launch.py now:
+
+- Prompts for user creation if no users exist in user_profiles.json
+
+- Displays camera feed with live face detection using Hailo hardware
+
+- Shows time and weather (fallback to "N/A" if API fails)
+
+- Applies Gaussian blur to the video feed if no face is detected
+
+- Successfully tested GUI from VS Code terminal — verified green bounding boxes follow face
+
+- Verified Hailo accelerator (not CPU fallback like Haar cascades) is in use
+
+# JSON Schema & Profile Enhancements
+
+- user_profiles.json now expected to hold:
+
+-      name, location, dob, sex, preferences, snapshots
+
+-Created and integrated create_new_user() in user_profiles.py to align new user structure with project goals
+
+# Folder Structure
+
+- Reviewed and aligned current folder layout:
+
+  - src/ still houses modular logic (camera, UI, face detection, etc.)
+
+  - data/users/ directory will hold future user-specific snapshots
+
+  - notebooks/overview.md updated for consistency with implemented features
+
+# ⚠️ Notes
+
+- First-time user registration currently uses a pop-up (QInputDialog) — future improvement will be GUI-only inside the mirror display
+
+- user_profiles.json must start empty {} to allow prompting
+
+- No face profile matching/recognition logic active yet — only detection via Hailo YOLOv5s model
+- ----------------------------------------------------------

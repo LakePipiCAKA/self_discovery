@@ -1,8 +1,7 @@
----
-
 ## 🧑‍🎨 General Use Case & Flow
 
 When the Smart Mirror powers on (either via actual mirror hardware or a touchscreen device), it launches the main app.
+<!-- confirmed working as of 2025-05-06 -->
 
 ### 👋 Default (Non-Identified User)
 - Displays greeting: **"Hello there beautiful!"** at the top.
@@ -24,143 +23,70 @@ When the Smart Mirror powers on (either via actual mirror hardware or a touchscr
   - Sex
 - Includes **face training and image capture** to recognize the user later.
 - Profile data and face encoding are saved locally (TBD storage strategy).
+![Basic Wire Frame](image.png)
 
 ---
 
 ### 🗂️ User Profile Management
+- Profiles are stored in a lightweight JSON (`src/user_management/user_profiles.json`)
+- Users are currently limited to 4–5
+- Each profile contains:
+  - Name, Location (lat/lon), City
+  - Date of birth
+  - Sex
+  - [Future] Skin analysis metrics or reference history
+<!-- confirmed updated JSON format 2025-05-06 -->
 
-The `user_management/` module handles the creation, storage, and retrieval of user profiles.
+---
 
-#### 📁 Folder Structure:
-- `user_profiles.py`: Handles profile creation, loading, and updates.
-- `user_profiles.json`: Local storage of user data in JSON format.
+### 🧠 Face Detection and Recognition
+- Powered by **Hailo-8L** accelerator and `.hef` model:
+  - `models/hailo/yolov5s_personface_h8l.hef`
+  - Uses `yolov5_nms_postprocess` as output key
+- Bounding boxes now confirmed working via `face_detector.py` <!--May need tweaking, square not around the face, bounce around 5/6/25->
+<!-- Confirmed 2025-05-06. Not using Haarcascade. -->
 
-#### 🧩 Key Data Stored Per User:
-- Name
-- Location (city, country)
-- Date of birth
-- Sex
-- Preferences (e.g., display tips: yes/no)
-- Facial encoding or training image references
+---
 
-#### 🔐 Considerations:
-- Profiles are stored locally — no cloud access by default.
-- Future improvements may include:
-  - Automatic backup or export
-  - Data encryption or profile PINs
-  - Face encoding stored alongside metadata
+### 📁 Folder Structure (as of 2025-05-06)
 
-#### 🛠 Future Feature Ideas:
+self_discovery/
+├── data/users # [future] user image or health tracking data
+├── gui/main_app_launch.py # Launches PyQt GUI, calls face detector <!--Woking 5/6/25-->
+├── models/hailo/ # Hailo model + config <!--WORKING 5/6/25-->
+│ ├── yolov5_personface.json
+│ └── yolov5s_personface_h8l.hef
+├── notebooks/
+│ ├── `overview.md` # This file
+│ ├── devlog.md # Running log of changes
+│ └── `image.png` # Sample wireframe
+├── src/
+│ ├── camera/ # camera_interface.py for libcamera access
+│ ├── face_detection/ # `face_detector.py' <!--working 5/6/25
+│ ├── ui/ # Stubbed PyQt UI handlers
+│ ├── user_analysis/ # Placeholder for future skin/health trends
+│ ├── user_management/ # JSON profiles, new user creation
+│ └── weather/ # Weather logic using Open-Meteo API
+├── tests/ # Includes camera + model test scripts
+└── requirements.txt # Installed in venv
+
+<!-- Scripts like hailo_face_detector_flat_display.py deprecated — no longer referenced in GUI -->
+
+---
+
+### 📊 Future Plans (Post MVP)
+- Add profile settings screen (PyQt)
+- Health tracking via face analysis (skin, weight, alerting changes)
+- More flexible location input (no GPS, this is a mirror proejct, select city/state/country)
+- Create fallback if Hailo hardware not detected
 - Profile deletion or editing via GUI
 - Profile image preview
 - Profile-specific settings (theme, layout, tips frequency)
 
 ---
 
----
-
-### 🧠 Face Detection Module
-
-Located in: `src/face_detection/`
-
-#### 📁 Files:
-- `hailo_face_detector.py`: Main interface to Hailo `.hef` model using `hailo-platform`
-- `test_face_detector.py`: Script to test face detection pipeline
-- `test_hailo_model.py`: Used to verify Hailo Platform installation and functionality
-
-#### 🧩 Role:
-- Loads face detection model from `models/hailo/`
-- Processes camera frames to detect faces
-- Returns:
-  - Bounding boxes
-  - Confidence scores
-
-#### 🔜 To Do:
-- Confirm `.hef` model path and structure
-- Add fallback logic if Hailo device is not found
-- Wrap detection in a reusable class callable by GUI or test scripts
-
----
-
-### 🎛️ GUI Layer
-
-Folders:  
-- `Gui/` or `gui/`: Entry point via `Main_App_Launch.py`  
-- `src/ui/`: Modular display components
-
-#### 📁 Files in `ui/`:
-- `default.py`: Possibly base layout or fallback display
-- `monitoring_display.py`: Likely handles main visual overlays
-- `recognition.py`: Handles face recognition hooks or confirmation
-- `selection.py`, `training.py`: Used for profile creation or user interaction
-
-#### 💡 UI Strategy:
-- Built with **PyQt5**
-- Display widgets **along the sides**, center remains reflective
-- Dynamically update:
-  - Greeting message
-  - Time + weather
-  - Profile-related info
-
-#### 🛠 Potential Widgets:
-- Clock and weather panel
-- User greeting section
-- Daily tips or alerts area
-- User profile details (non-intrusive)
-
----
-
-### 🌦️ Weather Integration
-
-File: `src/weather/open_meteo.py`
-
-#### 🔌 API Functionality:
-- Calls Open-Meteo or similar weather API
-- Uses:
-  - Profile location (if available)
-  - Manual input (City, Country) for non-profile users
-
-#### 📊 Data Fetched:
-- Current weather conditions
-- Temperature
-- Optional: forecast or alerts
-
-#### 🔐 Considerations:
-- Use caching to avoid rate limits
-- Provide fallback display on API failure
-- Normalize city/country input from GUI for cleaner requests
-
----
-
----
-
-### 🧑‍🏫 Personalized Experience
-Once a profile is created:
-- Mirror uses face detection to greet the user:
-  - **"Hello there {name}, you beautiful, you!"**
-- Displays:
-  - Time and weather (based on profile location)
-  - Personalized content along the **sides of the screen**
-  - Layout avoids blocking the center mirror space
-
----
-
-### 📷 Facial Observation & Daily Image Capture (Future)
-- Automatically captures daily images
-- Tracks:
-  - Skin tone changes
-  - Eye white coloration
-  - Pimples or blemishes
-  - General "beauty health" observations
-- Considerations:
-  - Storage limits (local RPi storage constraints)
-  - Data retention strategy
-
----
-
-### 💄 Tips & Recommendations (Planned Feature)
-- Targeted toward frequent female users
-- At profile setup, user can **opt in to receive beauty tips**
-- Future goal: Use ML to detect changes and generate personalized tips
-
----
+### 🛠 Implementation Notes
+- Camera handled through `camera_interface.py`
+- GUI uses PyQt5, launches cleanly after reinstalling Qt plugins
+- All inference offloaded to Hailo hardware
+- Current JSON is sufficient; SQLite not needed for <10 users

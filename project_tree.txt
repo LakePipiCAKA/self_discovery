@@ -1,0 +1,55 @@
+/home/taran/self_discovery
+├── gui
+│   └── main_app_launch.py
+├── hailort.1.log
+├── hailort.log
+├── LICENSE
+├── models
+│   └── hailo
+│       ├── yolov5_personface.json
+│       └── yolov5s_personface_h8l.hef
+├── notebooks
+│   ├── devlog.md
+│   ├── image.png
+│   └── overview.md
+├── project_tree.txt
+├── README.md
+├── requirements.txt
+├── src
+│   ├── camera
+│   │   ├── camera_interface.py
+│   │   └── __pycache__
+│   ├── face_detection
+│   │   ├── hailo_face_detector.py
+│   │   ├── hailo_runtime.py
+│   │   ├── __pycache__
+│   │   ├── test_hailo.py
+│   │   └── yolo_postprocessing.py
+│   ├── ui
+│   │   ├── default.py
+│   │   ├── monitoring_display.py
+│   │   ├── recognition.py
+│   │   ├── selection.py
+│   │   └── training.py
+│   ├── user_management
+│   │   ├── user_profiles.json
+│   │   └── user_profiles.py
+│   └── weather
+│       └── open_meteo.py
+└── tests
+    ├── camera_interface_update.py
+    ├── hailo_face_detector_flat_display.py
+    ├── hailo_face_detector_flat.py
+    ├── hailort.log
+    ├── new_hailo.detection.py
+    ├── __pycache__
+    │   └── hailo_face_detector_flat.cpython-311.pyc
+    ├── Smart Mirror Camera Feed_screenshot_04.05.2025.png
+    ├── test_basic_camera.py
+    ├── test_face_detector.py
+    ├── test_hailo_model.py
+    ├── test_hailort.py
+    ├── test_hailo_runtime.py
+    └── test_inference.py
+
+15 directories, 38 files

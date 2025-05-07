@@ -1,38 +1,51 @@
-"""
-Simple user profile management for the Smart Mirror
-"""
+import json
+import os
 
-# Sample user profiles with their locations
-USER_PROFILES = {
-    "user1": {
-        "name": "John",
-        "location": {
-            "name": "Chandler, AZ",
-            "lat": 33.3062,
-            "lon": -111.8413
-        }
-    },
-    "user2": {
-        "name": "Jane",
-        "location": {
-            "name": "Phoenix, AZ",
-            "lat": 33.4484,
-            "lon": -112.0740
-        }
-    }
+USER_PROFILE_PATH = os.path.join(os.path.dirname(__file__), "user_profiles.json")
+
+DEFAULT_PROFILE_TEMPLATE = {
+    "name": "",
+    "registered": False,
+    "location": {"name": "Unknown", "country": "Unknown", "lat": 0.0, "lon": 0.0},
+    "date_of_birth": None,
+    "sex": None,
+    "preferences": {"display_tips": True},
+    "facial_data": {"encodings": [], "training_images": []},
+    "snapshots": [],
 }
 
-def get_user_by_id(user_id):
-    """Get a user profile by ID"""
-    return USER_PROFILES.get(user_id)
 
-def get_default_user():
-    """Get the default user (no user recognized)"""
+def load_profiles():
+    if not os.path.exists(USER_PROFILE_PATH):
+        return {}
+
+    try:
+        with open(USER_PROFILE_PATH, "r") as f:
+            data = json.load(f)
+            # Ensure all required keys are present
+            for user_id, profile in data.items():
+                for key, default_value in DEFAULT_PROFILE_TEMPLATE.items():
+                    if key not in profile:
+                        profile[key] = default_value
+            return data
+    except json.JSONDecodeError:
+        return {}
+
+
+def create_new_user(name):
+    """Creates a new user profile with default values."""
     return {
-        "name": "Guest",
-        "location": "default"  # This will use Brasov, Romania
+        "name": name,
+        "location": {"name": "Unknown", "lat": 0.0, "lon": 0.0},
+        "dob": None,
+        "sex": None,
+        "preferences": {"show_tips": True},
+        "snapshots": [],
     }
 
-def get_all_users():
-    """Get all user profiles"""
-    return USER_PROFILES
+
+def save_profile(user_id, profile):
+    profiles = load_profiles()
+    profiles[user_id] = profile
+    with open(USER_PROFILE_PATH, "w") as f:
+        json.dump(profiles, f, indent=4)
