@@ -12,6 +12,8 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QWidget,
     QVBoxLayout,
+    QMessageBox,
+    QInputDialog,
 )
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QTimer, Qt
@@ -55,8 +57,30 @@ class SmartMirrorApp(QMainWindow):
             self.face_detector = None
 
         self.users = load_profiles()
+
         if not self.users:
-            print("⚠️ No registered users. Running in limited mode.")
+            print("⚠️ No registered users. Prompting to create one.")
+            response = QMessageBox.question(
+                self,
+                "No User Profiles",
+                "No user profiles found. Would you like to create one now?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes,
+            )
+
+            if response == QMessageBox.Yes:
+                name, ok = QInputDialog.getText(self, "Create User", "Enter your name:")
+                if ok and name:
+                    create_new_user(name, self.camera)
+                    self.users = load_profiles()
+                    if self.users:
+                        print("✅ New user created and loaded.")
+                    else:
+                        print("❌ User creation failed or was canceled.")
+                else:
+                    print("🚫 User creation canceled or no name entered.")
+            else:
+                print("👤 Continuing in limited mode (no users).")
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
@@ -103,14 +127,17 @@ class SmartMirrorApp(QMainWindow):
 
         face_found = len(boxes) > 0
         self.greeting_label.setText(
-            "👋 Hello there!" if face_found else "😴 Waiting for face..."
+            "👋 Hey there!" if face_found else "😴 Waiting for face..."
         )
 
         if not face_found and self.blur_when_no_face:
             frame = cv2.GaussianBlur(frame, (15, 15), 0)
 
         for detection in boxes:
-            if len(detection) >= 5:
+            if len(detection) >= 6:
+                x, y, w, h, conf, class_id = detection[:6]
+                label = f"Class {int(class_id)} ({conf:.2f})"
+            elif len(detection) >= 5:
                 x, y, w, h, conf = detection[:5]
                 label = f"{conf:.2f}"
             else:

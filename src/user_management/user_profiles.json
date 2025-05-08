@@ -1,1 +1,24 @@
-{}
+{
+    "test_sorin": {
+        "name": "Test Sorin",
+        "registered": true,
+        "location": {
+            "name": "Unknown",
+            "country": "Unknown",
+            "lat": 0.0,
+            "lon": 0.0
+        },
+        "date_of_birth": null,
+        "sex": null,
+        "preferences": {
+            "display_tips": true
+        },
+        "facial_data": {
+            "encodings": [],
+            "training_images": []
+        },
+        "snapshots": [
+            "/home/taran/self_discovery/data/users/test_sorin/snapshot.jpg"
+        ]
+    }
+}
