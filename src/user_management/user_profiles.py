@@ -1,6 +1,8 @@
 import json
 import os
 import cv2
+import time
+from PyQt5.QtWidgets import QMessageBox
 
 USER_PROFILE_PATH = os.path.join(os.path.dirname(__file__), "user_profiles.json")
 USER_DATA_ROOT = os.path.abspath(
@@ -55,6 +57,13 @@ def create_new_user(name, camera=None):
     snapshot_path = os.path.join(user_folder, "snapshot.jpg")
 
     if camera:
+        QMessageBox.information(
+            None,
+            "Get Ready",
+            "Please center your face and look at the camera.\nSnapshot will be taken in 3 seconds.",
+        )
+
+        time.sleep(3)
         frame = camera.get_frame()
         if frame is not None:
             frame = cv2.flip(frame, 1)

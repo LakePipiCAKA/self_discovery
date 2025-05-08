@@ -347,3 +347,12 @@ Not needed now, but structure things to make switch painless.
 
 - No face profile matching/recognition logic active yet — only detection via Hailo YOLOv5s model
 - ----------------------------------------------------------
+
+### [Update] UI Folder Removed
+- Removed unused `src/ui/` folder to simplify structure.
+- All logic now lives in:
+  - `gui/` for the main application launcher and integration
+  - `user_management/` for profile, snapshot, embedding, and recognition
+  - `face_detection/` for Hailo detection logic
+  - `camera/` for camera stream handling
+  - `data/users/` for storing snapshots
