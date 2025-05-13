@@ -1,7 +1,9 @@
+# /home/taran/self_discovery/src/camera/camera_interface.py
 from picamera2 import Picamera2
 import cv2
 import numpy as np
 import time
+
 
 class CameraInterface:
     def __init__(self, resolution=(640, 480)):
@@ -17,11 +19,12 @@ class CameraInterface:
         frame = self.picam.capture_array()
         if rgb:
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        
-        return frame #default is BGR
+
+        return frame  # default is BGR
 
     def stop(self):
         self.picam.close()
+
 
 # Test mode
 if __name__ == "__main__":
@@ -29,9 +32,9 @@ if __name__ == "__main__":
     try:
         while True:
             frame = cam.get_frame()
-            #frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) --made skin look blue
+            # frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) --made skin look blue
             cv2.imshow("Smart Mirror Camera Feed", frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
     finally:
         cam.stop()

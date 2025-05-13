@@ -1,3 +1,4 @@
+# /home/taran/self_discovery/gui/main_app_launch.py
 import sys
 import os
 import cv2
@@ -23,6 +24,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 from face_detection.face_detector import HailoFaceDetector
 from camera.camera_interface import CameraInterface
 from user_management.user_profiles import load_profiles, save_profile, create_new_user
+from user_management.recognize_face import recognize_face
 
 
 class SmartMirrorApp(QMainWindow):
@@ -118,6 +120,7 @@ class SmartMirrorApp(QMainWindow):
             return
 
         frame = cv2.flip(frame, 1)
+        print("Frame shape:", frame.shape)
 
         try:
             boxes = self.face_detector.detect_faces(frame)

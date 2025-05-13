@@ -356,3 +356,47 @@ Not needed now, but structure things to make switch painless.
   - `face_detection/` for Hailo detection logic
   - `camera/` for camera stream handling
   - `data/users/` for storing snapshots
+
+### 📅 2025-05-13 — Face Recognition Loop, Registration Fixes, and Hailo Integration Review
+
+#### ✅ Key Progress
+
+- **Standalone face recognition script (`recognize_face.py`) fully functional**
+  - Replaced OpenCV’s `cv2.VideoCapture` with `CameraInterface()` to support Picamera2 and IMX708
+  - Integrated with Hailo-accelerated face detector
+  - Confirmed real-time detection and labeling flow
+
+- **Cleaned and enhanced `create_new_user()` in `user_profiles.py`**
+  - Now supports multiple snapshots during registration (default: 3)
+  - Saves image files under `data/users/{username}/`
+  - Extracts and stores multiple embeddings in JSON
+
+- **Tested face recognition on live camera**
+  - Detected faces correctly
+  - Returned “Unknown face” as expected since registration was not yet performed
+
+- **Resolved multiple import bugs and broken references**
+  - Restored `load_profiles()` and `save_profile()` after accidental removal
+  - Corrected path in `recognize_face.py` from `from user_profiles` → `from user_management.user_profiles`
+
+#### ⚠️ Known Issues
+
+- **Recognition is currently CPU-bound**
+  - `face_recognition` is not running on the Hailo
+  - This causes sluggish frame rates during real-time recognition
+
+- **Recognition loop uses only one embedding per user**
+  - Will update to support multiple vectors per user for higher reliability
+
+#### 🔍 Insights
+
+- Face detection is successfully offloaded to Hailo — fast and accurate
+- Face recognition (embedding + compare) still runs on CPU — improvement needed
+- Hailo does not natively run `face_recognition`-style embedding without converting a face encoder model to `.hef`
+
+#### 🧭 Next Steps (Post-Rest)
+
+- Re-register user using the new multi-snapshot flow
+- Patch recognition to support multiple embeddings per user
+- Optionally: Explore embedding model (e.g., ArcFace) conversion to `.hef` for full Hailo inference
+

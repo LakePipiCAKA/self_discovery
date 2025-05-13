@@ -1,3 +1,4 @@
+# /home/taran/self_discovery/src/user_management/embed_face.py
 import os
 import face_recognition
 import json

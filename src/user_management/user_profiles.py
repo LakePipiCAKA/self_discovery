@@ -1,24 +1,62 @@
-import json
-import os
-import cv2
-import time
-from PyQt5.QtWidgets import QMessageBox
+def create_new_user(name, camera=None, snapshot_count=3):
+    """Creates a new user profile with multiple snapshots and facial embeddings."""
+    import face_recognition
+    from datetime import datetime
+    from PyQt5.QtWidgets import QApplication
 
-USER_PROFILE_PATH = os.path.join(os.path.dirname(__file__), "user_profiles.json")
-USER_DATA_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../../data/users")
-)
+    user_id = name.lower().replace(" ", "_")
+    user_folder = os.path.join(USER_DATA_ROOT, user_id)
+    os.makedirs(user_folder, exist_ok=True)
 
-DEFAULT_PROFILE_TEMPLATE = {
-    "name": "",
-    "registered": False,
-    "location": {"name": "Unknown", "country": "Unknown", "lat": 0.0, "lon": 0.0},
-    "date_of_birth": None,
-    "sex": None,
-    "preferences": {"display_tips": True},
-    "facial_data": {"encodings": [], "training_images": []},
-    "snapshots": [],
-}
+    profile = DEFAULT_PROFILE_TEMPLATE.copy()
+    profile["name"] = name
+    profile["registered"] = True
+
+    embeddings = []
+    training_images = []
+
+    for i in range(snapshot_count):
+        # Prompt before capturing
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle(f"Snapshot {i+1}/{snapshot_count}")
+        msg.setText("Please center your face and press OK to capture.")
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.exec_()
+
+        time.sleep(1.5)  # Let user reposition
+        if not camera:
+            print("⚠️ No camera provided.")
+            continue
+
+        frame = camera.get_frame()
+        if frame is None:
+            print("⚠️ Frame not captured.")
+            continue
+
+        frame = cv2.flip(frame, 1)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        filename = f"{timestamp}_snap{i+1}.jpg"
+        image_path = os.path.join(user_folder, filename)
+        cv2.imwrite(image_path, frame)
+
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        encodings = face_recognition.face_encodings(rgb)
+
+        if encodings:
+            embeddings.append(encodings[0].tolist())  # Ensure it's JSON serializable
+            training_images.append(image_path)
+            print(f"✅ Saved: {image_path}")
+        else:
+            print(f"⚠️ No face found in snapshot {i+1}. Skipped.")
+
+    if not embeddings:
+        print("❌ No valid encodings. User not saved.")
+        return
+
+    profile["facial_data"]["encodings"] = embeddings
+    profile["facial_data"]["training_images"] = training_images
+    profile["snapshots"] = training_images.copy()
 
 
 def load_profiles():
@@ -43,36 +81,5 @@ def save_profile(user_id, profile):
     with open(USER_PROFILE_PATH, "w") as f:
         json.dump(profiles, f, indent=4)
 
-
-def create_new_user(name, camera=None):
-    """Creates a new user profile, saves it, and captures one face snapshot if camera is provided."""
-    user_id = name.lower().replace(" ", "_")
-    user_folder = os.path.join(USER_DATA_ROOT, user_id)
-    os.makedirs(user_folder, exist_ok=True)
-
-    profile = DEFAULT_PROFILE_TEMPLATE.copy()
-    profile["name"] = name
-    profile["registered"] = True
-
-    snapshot_path = os.path.join(user_folder, "snapshot.jpg")
-
-    if camera:
-        QMessageBox.information(
-            None,
-            "Get Ready",
-            "Please center your face and look at the camera.\nSnapshot will be taken in 3 seconds.",
-        )
-
-        time.sleep(3)
-        frame = camera.get_frame()
-        if frame is not None:
-            frame = cv2.flip(frame, 1)
-            cv2.imwrite(snapshot_path, frame)
-            print(f"📸 Saved snapshot for {name} at {snapshot_path}")
-            profile["snapshots"].append(snapshot_path)
-        else:
-            print("⚠️ Camera frame not captured.")
-    else:
-        print("⚠️ No camera provided — skipping snapshot.")
-
     save_profile(user_id, profile)
+    print(f"🎉 Registered '{name}' with {len(embeddings)} snapshot(s).")

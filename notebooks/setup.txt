@@ -1,0 +1,134 @@
+taran@ibrokeitagain4:~ $ echo -e "\n=== RPi Model Info ==="; cat /proc/device-tree/model; \
+echo -e "\n=== CPU Info ==="; lscpu | grep -E 'Model name|Architecture|CPU\(s\)|Vendor ID'; \
+echo -e "\n=== RAM Info ==="; free -h; \
+echo -e "\n=== OS & Kernel ==="; uname -a; \
+echo -e "\n=== Firmware Version ==="; vcgencmd version
+
+=== RPi Model Info ===
+Raspberry Pi 5 Model B Rev 1.1
+=== CPU Info ===
+Architecture:                         aarch64
+CPU(s):                               4
+On-line CPU(s) list:                  0-3
+Vendor ID:                            ARM
+Model name:                           Cortex-A76
+CPU(s) scaling MHz:                   100%
+NUMA node0 CPU(s):                    0-3
+NUMA node1 CPU(s):                    0-3
+NUMA node2 CPU(s):                    0-3
+NUMA node3 CPU(s):                    0-3
+NUMA node4 CPU(s):                    0-3
+NUMA node5 CPU(s):                    0-3
+NUMA node6 CPU(s):                    0-3
+NUMA node7 CPU(s):                    0-3
+
+=== RAM Info ===
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       3.7Gi        10Gi       252Mi       2.3Gi        12Gi
+Swap:          511Mi          0B       511Mi
+
+=== OS & Kernel ===
+Linux ibrokeitagain4 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64 GNU/Linux
+
+=== Firmware Version ===
+2025/05/08 15:13:17 
+Copyright (c) 2012 Broadcom
+version 69471177 (release) (embedded)
+taran@ibrokeitagain4:~ $ 
+
+taran@ibrokeitagain4:~ $ libcamera-hello --version
+rpicam-apps build: v1.7.0 5a3f5965aca9 30-04-2025 (11:42:35)
+rpicam-apps capabilites: egl:1 qt:1 drm:1 libav:1
+libcamera build: v0.5.0+59-d83ff0a4
+taran@ibrokeitagain4:~ $ 
+
+taran@ibrokeitagain4:~ $ python3 -c "from picamera2 import Picamera2; print(Picamera2().camera_properties)"
+[1:36:12.292124127] [18680]  INFO Camera camera_manager.cpp:326 libcamera v0.5.0+59-d83ff0a4
+[1:36:12.300638288] [18686]  INFO RPI pisp.cpp:720 libpisp version v1.2.1 981977ff21f3 29-04-2025 (14:13:50)
+[1:36:12.311300841] [18686]  INFO RPI pisp.cpp:1179 Registered camera /base/axi/pcie@1000120000/rp1/i2c@88000/imx708@1a to CFE device /dev/media0 and ISP device /dev/media3 using PiSP variant BCM2712_D0
+{'Model': 'imx708', 'UnitCellSize': (1400, 1400), 'Location': 2, 'Rotation': 180, 'ColorFilterArrangement': 0, 'PixelArraySize': (4608, 2592), 'PixelArrayActiveAreas': [(16, 24, 4608, 2592)], 'ScalerCropMaximum': (0, 0, 0, 0), 'SystemDevices': (20753, 20754, 20755, 20756, 20757, 20758, 20759, 20740, 20741, 20742, 20743)}
+taran@ibrokeitagain4:~ $ 
+
+taran@ibrokeitagain4:~ $ hailortcli scan
+Hailo Devices:
+[-] Device: 0001:01:00.0
+taran@ibrokeitagain4:~ $ 
+
+
+taran@ibrokeitagain4:~ $ which python
+python --version
+pip freeze | grep -E 'hailo|opencv|picamera|pyqt'
+/usr/bin/python
+Python 3.11.2
+hailort==4.20.0
+picamera2==0.3.27
+taran@ibrokeitagain4:~ $ 
+
+taran@ibrokeitagain4:~/self_discovery $ tree -L 3
+.
+├── data
+│   └── users
+│       └── sorin_test
+├── gstshark_2025-05-12_20:27:42
+│   ├── datastream
+│   └── metadata
+├── gui
+│   └── main_app_launch.py
+├── hailort.1.log
+├── hailort.log
+├── LICENSE
+├── models
+│   └── hailo
+│       ├── yolov5_personface.json
+│       └── yolov5s_personface_h8l.hef
+├── notebooks
+│   ├── devlog.md
+│   ├── image.png
+│   └── overview.md
+├── project_tree.txt
+├── README.md
+├── requirements.txt
+├── src
+│   ├── camera
+│   │   ├── camera_interface.py
+│   │   └── __pycache__
+│   ├── face_detection
+│   │   ├── face_detector.py
+│   │   └── __pycache__
+│   ├── user_analysis
+│   ├── user_management
+│   │   ├── embed_face.py
+│   │   ├── __pycache__
+│   │   ├── recognize_face.py
+│   │   ├── user_profiles.json
+│   │   └── user_profiles.py
+│   └── weather
+│       └── open_meteo.py
+└── tests
+    ├── hailo_face_detector_flat_display.py
+    ├── hailort.log
+    ├── live_camera_test.py
+    ├── __pycache__
+    │   └── hailo_face_detector_flat.cpython-311.pyc
+    ├── test_basic_camera.py
+    ├── test_face_detector.py
+    └── test_hailo_model.py
+
+20 directories, 28 files
+taran@ibrokeitagain4:~/self_discovery $ 
+
+
+taran@ibrokeitagain4:~ $ python3 -c "import cv2; print('OpenCV version:', cv2.__version__)"
+python3 -c "from PyQt5.QtWidgets import QApplication; print('PyQt5 is installed')"
+OpenCV version: 4.6.0
+PyQt5 is installed
+taran@ibrokeitagain4:~ $ source smart_mirror_venv/bin/activate
+(smart_mirror_venv) taran@ibrokeitagain4:~ $ python3 -c "from PyQt5.QtWidgets import QApplication; print('PyQt5 is installed')"
+PyQt5 is installed
+(smart_mirror_venv) taran@ibrokeitagain4:~ $ 
+
+
+
+
+
+
