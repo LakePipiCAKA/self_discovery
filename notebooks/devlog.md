@@ -399,4 +399,91 @@ Not needed now, but structure things to make switch painless.
 - Re-register user using the new multi-snapshot flow
 - Patch recognition to support multiple embeddings per user
 - Optionally: Explore embedding model (e.g., ArcFace) conversion to `.hef` for full Hailo inference
+-------------------------------------------------------------------------
+### 5/14/25
+#### 📍 Where Profile Prompts Should Be Handled
 
+Right now, your only prompt is in:
+
+##### `user_profiles.py`  
+Specifically inside the `create_new_user()` function:
+```python
+name, ok = QInputDialog.getText(...)
+```
+
+But **location, date of birth, and sex** are part of your `DEFAULT_PROFILE_TEMPLATE`, so they **should also be collected here** — during profile creation.
+
+---
+
+## ✅ Recommended Flow
+
+Keep everything self-contained in `create_new_user(...)`:
+
+- Name → already collected in `main_app_launch.py` (keep that)
+- City, State, Country, DOB, Sex → handled via GUI-triggered flow (from "My Mirror Set Up" button)
+
+This way, `main_app_launch.py` just calls:
+```python
+trigger_registration_overlay()
+```
+
+And everything else is handled seamlessly on-screen with live preview and no popups.
+
+---
+
+### 🧩 Enhanced Registration Design for Mirror UI
+
+We'll use an integrated GUI flow with:
+
+- A button labeled "🪞 My Mirror Set Up"
+- Live camera feed remains active
+- On-screen countdown overlays: "Capturing in 3…2…1"
+- Three face snapshots silently taken
+- Encodings saved to `user_profiles.json`
+- Images saved to `data/users/<username>/` with timestamps
+- City, State (optional), and Country inputs shown directly on-screen via widgets
+- Date of Birth and Sex inputs included in form
+
+The registration logic will:
+- Require only City and Country for time/weather functions
+- Optionally store State
+- Hide unnecessary labels during capture
+- Temporarily show overlay text and camera capture box
+- Restore normal mirror mode once complete
+
+This allows profile creation to feel seamless and immersive, ideal for a smart mirror interface.
+----------------------------------------------------------------------
+#### 2025-05-14 – Registration and Recognition Fixes
+### ✅ Registration Improvements
+- Fully verified ProfileDetailsDialog now includes a working name field and properly styled inputs
+
+- Fixed a bug where "location" data was being saved under a nested "name" key instead of updating city, state, and country directly
+
+- Added missing get_name() method to ProfileDetailsDialog, resolving AttributeError during registration
+
+- Confirmed that facial encodings and snapshot images are saved successfully
+
+### Profile Sync
+- Ensured newly registered users are immediately active by:
+
+- Refreshing self.users after saving
+
+- Setting self.active_user = profile
+
+- Calling self.update_time() to reflect user's location in time & weather
+
+### Time & Weather Display
+- Fixed logic so time and weather now dynamically pull from the active_user profile (or fallback to Brasov)
+
+- Verified correct city/country appear after registration
+
+- Removed incorrect self.update_time(self.active_user["location"]["timezone"]) call which was referencing a non-existent field
+
+### Recognition Integration (next step)
+- Confirmed that registration encodes and saves user face data
+
+- Currently not performing recognition at app launch
+
+- Plan: add try_recognize_face() function to compare live camera feed with known profiles and auto-activate user
+``
+-----------------------------------------------------------------

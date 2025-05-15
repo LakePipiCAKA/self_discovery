@@ -1,30 +1,36 @@
-# /home/taran/self_discovery/gui/main_app_launch.py
+# /home/taran/self_discovery/gui/main_app_launch.py (updated with GUI-integrated registration flow)
+
 import sys
 import os
 import cv2
 import numpy as np
-import requests
 import time
 from datetime import datetime
-
 from PyQt5.QtWidgets import (
     QApplication,
     QLabel,
     QMainWindow,
     QWidget,
     QVBoxLayout,
-    QMessageBox,
-    QInputDialog,
+    QPushButton,
+    QLineEdit,
+    QDateEdit,
+    QComboBox,
 )
-from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, QDate
+from PyQt5.QtGui import QImage, QPixmap, QFont
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from face_detection.face_detector import HailoFaceDetector
 from camera.camera_interface import CameraInterface
-from user_management.user_profiles import load_profiles, save_profile, create_new_user
-from user_management.recognize_face import recognize_face
+from face_detection.face_detector import HailoFaceDetector
+from user_management.user_profiles import (
+    ProfileDetailsDialog,
+    save_profile,
+    load_profiles,
+    DEFAULT_PROFILE_TEMPLATE,
+)
+
+from weather.open_meteo import get_weather
 
 
 class SmartMirrorApp(QMainWindow):
@@ -38,137 +44,200 @@ class SmartMirrorApp(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
 
-        self.info_label = QLabel("Loading time and weather...")
+        self.info_label = QLabel("Time & Weather loading...")
         self.info_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.info_label)
 
-        self.greeting_label = QLabel("😴 Waiting for face...")
+        self.greeting_label = QLabel("❤️ Hello there beautiful stranger!")
         self.greeting_label.setAlignment(Qt.AlignCenter)
+        self.greeting_label.setFont(QFont("Arial", 16))
         self.layout.addWidget(self.greeting_label)
 
         self.camera_label = QLabel()
         self.layout.addWidget(self.camera_label)
 
+        self.setup_btn = QPushButton("My Mirror Set Up")
+        self.setup_btn.clicked.connect(self.begin_registration_sequence)
+        self.layout.addWidget(self.setup_btn)
+
         self.camera = CameraInterface()
-        hef_path = "/usr/share/hailo-models/yolov5s_personface_h8l.hef"
-
-        try:
-            self.face_detector = HailoFaceDetector(hef_path)
-        except Exception as e:
-            print(f"❌ Failed to initialize HailoFaceDetector: {e}")
-            self.face_detector = None
-
+        self.face_detector = HailoFaceDetector(
+            "/usr/share/hailo-models/yolov5s_personface_h8l.hef"
+        )
         self.users = load_profiles()
-
-        if not self.users:
-            print("⚠️ No registered users. Prompting to create one.")
-            response = QMessageBox.question(
-                self,
-                "No User Profiles",
-                "No user profiles found. Would you like to create one now?",
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.Yes,
-            )
-
-            if response == QMessageBox.Yes:
-                name, ok = QInputDialog.getText(self, "Create User", "Enter your name:")
-                if ok and name:
-                    create_new_user(name, self.camera)
-                    self.users = load_profiles()
-                    if self.users:
-                        print("✅ New user created and loaded.")
-                    else:
-                        print("❌ User creation failed or was canceled.")
-                else:
-                    print("🚫 User creation canceled or no name entered.")
-            else:
-                print("👤 Continuing in limited mode (no users).")
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
         self.timer.start(30)
 
         self.clock_timer = QTimer()
-        self.clock_timer.timeout.connect(self.update_time_weather)
+        self.clock_timer.timeout.connect(self.update_time)
         self.clock_timer.start(60000)
 
-        self.update_time_weather()
-        self.blur_when_no_face = True
+        self.update_time("Europe/Bucharest")
+        self.in_registration = False
+        self.capture_count = 0
+        self.registration_data = {}
 
-    def update_time_weather(self):
-        current_time = time.strftime("%H:%M:%S")
-        weather = self.get_weather()
-        self.info_label.setText(f"Time: {current_time} | Weather: {weather}")
+    def update_time(self, timezone=None):
+        import pytz
+        from datetime import datetime
 
-    def get_weather(self):
-        try:
-            lat, lon = 45.6528, 25.6108  # Brasov
-            url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
-            response = requests.get(url)
-            temperature = response.json()["current_weather"]["temperature"]
-            return f"{temperature}°C"
-        except Exception as e:
-            print(f"⚠️ Weather fetch error: {e}")
-            return "N/A"
+        # Use active user if available
+        user_profile = getattr(self, "active_user", None)
+
+        # Timezone logic
+        if timezone is None:
+            if (
+                user_profile
+                and user_profile.get("location", {}).get("country", "").lower()
+                == "romania"
+            ):
+                timezone = "Europe/Bucharest"
+            elif not user_profile:
+                timezone = "Europe/Bucharest"  # Default
+            else:
+                timezone = "UTC"
+
+        tz = pytz.timezone(timezone)
+        now = datetime.now(tz).strftime("%H:%M:%S")
+
+        # Weather logic
+        weather = get_weather(user_profile["location"] if user_profile else "default")
+        weather_text = f"{weather['location']}: {weather['temperature']}°F • {weather['condition']} • Wind {weather['wind']} mph"
+
+        self.info_label.setText(f"Time: {now} | {weather_text}")
 
     def update_frame(self):
-        if not self.face_detector:
-            return
-
         frame = self.camera.get_frame()
         if frame is None:
             return
 
         frame = cv2.flip(frame, 1)
-        print("Frame shape:", frame.shape)
 
-        try:
-            boxes = self.face_detector.detect_faces(frame)
-        except Exception as e:
-            print(f"❌ Face detection error: {e}")
-            return
+        if self.in_registration:
+            overlay = f"Capturing in {3 - self.capture_count}…"
+            self.greeting_label.setText(overlay)
 
-        face_found = len(boxes) > 0
-        self.greeting_label.setText(
-            "👋 Hey there!" if face_found else "😴 Waiting for face..."
-        )
-
-        if not face_found and self.blur_when_no_face:
-            frame = cv2.GaussianBlur(frame, (15, 15), 0)
-
-        for detection in boxes:
-            if len(detection) >= 6:
-                x, y, w, h, conf, class_id = detection[:6]
-                label = f"Class {int(class_id)} ({conf:.2f})"
-            elif len(detection) >= 5:
-                x, y, w, h, conf = detection[:5]
-                label = f"{conf:.2f}"
+            if self.capture_count < 3:
+                if (
+                    not hasattr(self, "last_capture_time")
+                    or time.time() - self.last_capture_time > 2
+                ):
+                    self.capture_snapshot(frame)
+                    self.capture_count += 1
+                    self.last_capture_time = time.time()
+                else:
+                    pass  # wait
             else:
-                x, y, w, h = detection
-                label = "Face"
-
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(
-                frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
-            )
+                self.finish_registration()
+                return
 
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb.shape
-        qt_image = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
+        qt_img = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
         self.camera_label.setPixmap(
-            QPixmap.fromImage(qt_image.scaled(800, 500, Qt.KeepAspectRatio))
+            QPixmap.fromImage(qt_img).scaled(800, 500, Qt.KeepAspectRatio)
         )
 
+    def begin_registration_sequence(self):
+        from user_management.user_profiles import ProfileDetailsDialog
+
+        dialog = ProfileDetailsDialog()
+        if not dialog.exec_():
+            print("🚫 User canceled registration.")
+            return
+
+        name = dialog.get_name()
+
+        location = dialog.get_location()
+
+        if not location.get("city") or not location.get("country"):
+            print("❗ City and Country are required. Registration canceled.")
+            return
+
+        self.registration_data = {
+            "name": name,
+            "location": location,
+            "dob": dialog.get_dob(),
+            "sex": dialog.get_sex(),
+            "snapshots": [],
+            "encodings": [],
+        }
+        self.in_registration = True
+        self.capture_count = 0
+        print("🟢 Starting registration in GUI mode")
+        print("🟢 Starting registration in GUI mode")
+
+    def capture_snapshot(self, frame):
+        import face_recognition
+
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        user_id = self.registration_data["name"].lower()
+        folder = os.path.join("data", "users", user_id)
+        os.makedirs(folder, exist_ok=True)
+        filename = os.path.join(folder, f"{timestamp}_snap{self.capture_count+1}.jpg")
+        cv2.imwrite(filename, frame)
+
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        encs = face_recognition.face_encodings(rgb)
+        if encs:
+            self.registration_data["encodings"].append(encs[0].tolist())
+            self.registration_data["snapshots"].append(filename)
+            print(f"✅ Captured and saved {filename}")
+        else:
+            print("⚠️ No face detected in snapshot")
+
+    def finish_registration(self):
+        profile = DEFAULT_PROFILE_TEMPLATE.copy()
+        profile["name"] = self.registration_data["name"]
+        profile["registered"] = True
+        profile["location"].update(self.registration_data["location"])
+        profile["date_of_birth"] = self.registration_data["dob"]
+        profile["sex"] = self.registration_data["sex"]
+        profile["facial_data"]["encodings"] = self.registration_data["encodings"]
+        profile["facial_data"]["training_images"] = self.registration_data["snapshots"]
+        profile["snapshots"] = self.registration_data["snapshots"]
+
+        user_id = self.registration_data["name"].lower()
+        save_profile(user_id, profile)
+        self.users = load_profiles()  # Refresh user profiles
+        self.active_user = profile  # 🔄 Set active user for location/time
+        self.update_time()
+        self.greeting_label.setText(f"🎉 Welcome, {profile['name']}!")
+        print("✔️ Registration completed")
+        self.in_registration = False
+
     def closeEvent(self, event):
-        if self.camera:
-            self.camera.stop()
-        if self.face_detector:
-            self.face_detector.close()
+        self.camera.stop()
+        self.face_detector.close()
         event.accept()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    # Apply global dark stylesheet
+    app.setStyleSheet(
+        """
+    QWidget {
+        background-color: #121212;
+        color: #FFFFFF;
+    }
+    QLabel {
+        font-size: 14px;
+    }
+    QPushButton {
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background-color: #2D2D2D;
+        color: #FFFFFF;
+    }
+    QPushButton:hover {
+        background-color: #3D3D3D;
+    }
+"""
+    )
     window = SmartMirrorApp()
     window.show()
     sys.exit(app.exec_())
