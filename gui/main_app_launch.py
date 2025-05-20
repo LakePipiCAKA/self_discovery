@@ -230,7 +230,12 @@ class SmartMirrorApp(QMainWindow):
 
         tip = analyze_face_history(user_id, folder)
         print(f"💡 Skin Tip: {tip}")
-        self.greeting_label.setText(f"💡 Tip: {tip}")
+        if self.active_user:
+            self.greeting_label.setText(
+                f"🌞 Welcome back, {self.active_user['name']}!\n💡 {tip}"
+            )
+        else:
+            self.greeting_label.setText(f"💡 {tip}")
 
         # Save tip to daily_tips.json
         tips_path = os.path.join(folder, "daily_tips.json")
