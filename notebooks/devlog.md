@@ -487,3 +487,26 @@ This allows profile creation to feel seamless and immersive, ideal for a smart m
 - Plan: add try_recognize_face() function to compare live camera feed with known profiles and auto-activate user
 ``
 -----------------------------------------------------------------
+### 📅 2025-05-20 — Daily Tips Engine + Emoji Timeline
+
+#### ✅ New Features
+- Skin tips are now generated after each daily snapshot (morning, afternoon, evening).
+- Tips include emojis based on brightness and consistency:
+  - 😓 Your skin looks a bit dull...
+  - ☀️ Skin tone looks uneven...
+  - 😊 Skin looks consistent...
+- Tips are displayed in the GUI after snapshot capture.
+- Each user's tips are stored in:  
+  `data/users/<username>/daily_tips.json`
+
+#### 📊 Visualization
+- Added `src/user_analysis/plot_history.py`
+- Function `plot_user_skin_history(user_id)` reads `daily_tips.json` and displays an emoji timeline using matplotlib.
+- Timeline includes date and time period labels (e.g., `05-20 (morning)`), helping visualize tip trends over time.
+
+#### 🧠 Design Choices
+- Tips are stored separately from `user_profiles.json` to avoid bloating core metadata.
+- Visualization is external — not integrated into the PyQt GUI (by design).
+- Plot uses Matplotlib popup window (Figure 1), not the mirror display.
+
+---
