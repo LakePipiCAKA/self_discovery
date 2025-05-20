@@ -90,3 +90,45 @@ self_discovery/
 - GUI uses PyQt5, launches cleanly after reinstalling Qt plugins
 - All inference offloaded to Hailo hardware
 - Current JSON is sufficient; SQLite not needed for <10 users
+
+---
+
+## 🪞 Smart Mirror — Phase II Overview
+
+### 📍 Project Status
+Phase I is complete and merged into `main`. All core functionality is live:
+- User face recognition with Hailo-accelerated detection
+- GUI-based registration with city/state/country
+- Daily face snapshots (up to 3/day)
+- Tip generation based on face brightness + consistency
+- Emoji-based feedback displayed live in GUI
+- Tip history saved per user
+- Matplotlib visualization tool added to plot emoji tip timeline
+
+### 🚀 Phase II Goals
+This new development phase begins on branch: `phase-ii-smart-mirror`
+
+#### Planned Enhancements:
+- [ ] Integrate more advanced image analysis (e.g. skin redness, texture)
+- [ ] Add tip history viewer inside GUI
+- [ ] Enable health-related suggestions beyond skin (hydration, fatigue, etc)
+- [ ] Build API for syncing tips/stats to cloud or app
+- [ ] Prepare Hailo-based ML model for natural-language tip generation (GPT2-tiny or similar)
+
+### 🧭 Structure Recap
+User profiles remain in `user_profiles.json` under `src/user_management/`
+Skin tips are saved in `daily_tips.json` inside each user's folder:
+```
+data/users/<username>/daily_tips.json
+```
+Visualization logic lives in:
+```
+src/user_analysis/plot_history.py
+```
+
+### 📌 Next Steps
+- Finalize Phase I cleanup (minor greeting tweaks, backup profiles)
+- Begin Phase II development from `phase-ii-smart-mirror`
+- Continue logging skin data and refining tip generation
+
+---
