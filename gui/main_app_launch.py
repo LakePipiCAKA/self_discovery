@@ -55,7 +55,7 @@ class SmartMirrorApp(QMainWindow):
         self.camera_label = QLabel()
         self.layout.addWidget(self.camera_label)
 
-        self.setup_btn = QPushButton("My Mirror Set Up")
+        self.setup_btn = QPushButton("+ Add New User")
         self.setup_btn.clicked.connect(self.begin_registration_sequence)
         self.layout.addWidget(self.setup_btn)
 
@@ -85,6 +85,9 @@ class SmartMirrorApp(QMainWindow):
         self.recognition_active = True
         self.snapshot_log = set()
         self.active_user = None
+        # Hide the Add New User button if a user is recognized
+        if self.active_user:
+            self.setup_btn.hide()
 
     def update_time(self, timezone=None):
         user_profile = getattr(self, "active_user", None)
@@ -161,6 +164,7 @@ class SmartMirrorApp(QMainWindow):
                             or self.active_user.get("name") != profile["name"]
                         ):
                             self.active_user = profile
+                            self.setup_btn.hide()
                             self.update_time()
                             self.greeting_label.setText(
                                 f"🌞 Welcome back, {profile['name']}!"
@@ -320,6 +324,7 @@ class SmartMirrorApp(QMainWindow):
         self.active_user = None
         self.recognition_active = True
         self.greeting_label.setText("🔄 Please look at the mirror for recognition")
+        self.setup_btn.show()  # Re-enable the Add New User button
 
     def closeEvent(self, event):
         self.camera.stop()
