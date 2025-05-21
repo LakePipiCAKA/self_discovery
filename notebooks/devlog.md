@@ -510,3 +510,86 @@ This allows profile creation to feel seamless and immersive, ideal for a smart m
 - Plot uses Matplotlib popup window (Figure 1), not the mirror display.
 
 ---
+### 📅 2025-05-20 — GUI Cleanup, Performance Tweaks, and Future Plans
+
+#### ✅ Key Improvements
+
+- Renamed **“My Mirror Set Up”** button to **“+ Add New User”**
+- Added logic to:
+  - Hide the Add New User button once a user is recognized
+  - Show it again when “Switch User” is clicked
+- Confirmed app uses correct virtual environment: `/home/taran/smart_mirror_venv`
+- Deleted accidental venv at `/home/taran/self_discovery/smart_mirror_venv`
+
+---
+
+#### 🚀 Performance Optimizations
+
+- Changed face recognition interval from every 5 frames → every 30 frames
+  - Reduces CPU usage and lag
+  - Downside: can delay recognition by up to 3 seconds
+
+- Resized frame before face recognition (`small_rgb`) using `cv2.resize(...)`
+  - Cuts CPU face encoding time by ~60%
+
+- Deferred skin tip generation (calls `analyze_face_history()`) using `QTimer.singleShot(...)`
+  - Prevents UI freeze during JSON loading and tip analysis
+
+---
+
+#### ⚡ Remaining Bottleneck
+
+- Face detection runs on **Hailo-8L (✅ fast)**
+- Face encoding (`face_recognition.face_encodings`) runs on **CPU (❌ slow)**
+- This is the **main source of lag** during recognition
+
+---
+
+#### 🧠 Exploration & Next Steps
+
+Discussed face embedding strategies:
+
+- Manual vector matching (cosine similarity) is easy and fast once embeddings are available
+- Hailo-compatible embedding models identified:
+  - ✅ **MobileFaceNet** (128D) — fast, small
+  - ✅ **ArcFace IR-SE50** (512D) — high accuracy, more RAM needed
+  - ✅ **SFace** — robust under aging, angles, lighting
+
+Plan to:
+- Find a tested `.onnx` or `.pb` face embedding model
+- Convert it to `.hef` using Hailo Model Zoo or TAPPAS
+- Replace CPU-based encoding with Hailo inference
+- Use NumPy-based manual vector matching for face recognition
+
+---
+
+#### 🧪 Optional Diagnostic Tools
+
+- Added print timing blocks (commented out) to monitor recognition performance
+  ```python
+  start = time.time()
+  ...
+  end = time.time()
+  print(f"⏱ Recognition time: {end - start:.2f} sec")
+-----
+### 📅 2025-05-20 — Phase II Kickoff: Face Embedding Optimization & Model Prep
+
+#### ✅ Key Goals for Phase II
+- Offload CPU-bound face embedding to Hailo-8L
+- Replace `face_recognition.face_encodings()` with a Hailo-compatible alternative
+- Prepare MobileFaceNet `.onnx` for `.hef` conversion
+
+---
+
+### 🧠 What Was Accomplished
+
+- Investigated multiple `.onnx` sources for `mobilefacenet` (InsightFace, ONNX Zoo, GitHub mirrors)
+- Confirmed:
+  - No `.hef` face embedding model was present on system
+  - Hailo Dataflow Compiler (DFC) is x86-only — cannot compile `.onnx` on Raspberry Pi 5
+- Successfully downloaded verified `mobilefacenet.onnx` via stable Dropbox mirror
+
+```bash
+wget -O mobilefacenet.onnx "https://www.dropbox.com/scl/fi/zghvh4yrdj7xjk7ihvj1c/mobilefacenet.onnx?rlkey=99a5q3nzzczkpkrcph68isvrg&dl=1"
+mv mobilefacenet.onnx ~/self_discovery/models/hailo/phase2_embedding/
+-------

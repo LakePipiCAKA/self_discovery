@@ -47,7 +47,7 @@ class SmartMirrorApp(QMainWindow):
         self.info_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.info_label)
 
-        self.greeting_label = QLabel("❤️ Hello there beautiful stranger!")
+        self.greeting_label = QLabel("❤️ Hello there stranger!")
         self.greeting_label.setAlignment(Qt.AlignCenter)
         self.greeting_label.setFont(QFont("Arial", 16))
         self.layout.addWidget(self.greeting_label)
@@ -85,7 +85,7 @@ class SmartMirrorApp(QMainWindow):
         self.recognition_active = True
         self.snapshot_log = set()
         self.active_user = None
-        # Hide the Add New User button if a user is recognized
+
         if self.active_user:
             self.setup_btn.hide()
 
@@ -144,11 +144,12 @@ class SmartMirrorApp(QMainWindow):
                 return
 
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        small_rgb = cv2.resize(rgb, (0, 0), fx=0.5, fy=0.5)
         self.frame_count += 1
 
-        if self.recognition_active and self.frame_count % 5 == 0:
-            face_locations = face_recognition.face_locations(rgb)
-            face_encodings = face_recognition.face_encodings(rgb, face_locations)
+        if self.recognition_active and self.frame_count % 30 == 0:
+            face_locations = face_recognition.face_locations(small_rgb)
+            face_encodings = face_recognition.face_encodings(small_rgb, face_locations)
 
             unmatched = True
             for face_encoding in face_encodings:
@@ -176,7 +177,7 @@ class SmartMirrorApp(QMainWindow):
 
             if unmatched and face_encodings:
                 self.greeting_label.setText(
-                    "👤 No match found — please create a profile"
+                    "😕 I don't recognize you yet. Want to add a profile?"
                 )
 
         h, w, ch = rgb.shape
@@ -232,14 +233,17 @@ class SmartMirrorApp(QMainWindow):
 
         from user_analysis.skin_analyzer import analyze_face_history
 
-        tip = analyze_face_history(user_id, folder)
-        print(f"💡 Skin Tip: {tip}")
-        if self.active_user:
-            self.greeting_label.setText(
-                f"🌞 Welcome back, {self.active_user['name']}!\n💡 {tip}"
-            )
-        else:
-            self.greeting_label.setText(f"💡 {tip}")
+        def delayed_tip():
+            tip = analyze_face_history(user_id, folder)
+            print(f"💡 Skin Tip: {tip}")
+            if self.active_user:
+                self.greeting_label.setText(
+                    f"🌞 Welcome back, {self.active_user['name']}!\n💡 {tip}"
+                )
+            else:
+                self.greeting_label.setText(f"💡 {tip}")
+
+        QTimer.singleShot(0, delayed_tip)
 
         # Save tip to daily_tips.json
         tips_path = os.path.join(folder, "daily_tips.json")
@@ -251,7 +255,7 @@ class SmartMirrorApp(QMainWindow):
         except FileNotFoundError:
             tips_data = {}
 
-        tips_data[f"{now.date()}_{period}"] = tip
+        tips_data[f"{now.date()}_{period}"] = "💡 (pending update)"
 
         with open(tips_path, "w") as f:
             json.dump(tips_data, f, indent=2)
@@ -324,7 +328,7 @@ class SmartMirrorApp(QMainWindow):
         self.active_user = None
         self.recognition_active = True
         self.greeting_label.setText("🔄 Please look at the mirror for recognition")
-        self.setup_btn.show()  # Re-enable the Add New User button
+        self.setup_btn.show()
 
     def closeEvent(self, event):
         self.camera.stop()
