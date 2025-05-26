@@ -1,0 +1,48 @@
+/* Global widget styling */
+QWidget {
+    background-color: #121212;  /* Matte black */
+    color: #E0E0E0;             /* Soft white text */
+    font-family: "Arial", sans-serif;
+}
+
+/* All QLabel widgets */
+QLabel {
+    font-size: 36px;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: rgba(0, 0, 0, 160);  /* Semi-transparent background */
+    padding: 12px;
+    border-radius: 10px;
+}
+
+/* Buttons */
+QPushButton {
+    font-size: 28px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: 12px;
+    background-color: #2D2D2D;
+    color: #FFFFFF;
+    border: 2px solid #444444;
+}
+
+QPushButton:hover {
+    background-color: #3D3D3D;
+    border: 2px solid #888888;
+}
+
+/* Camera preview label (optional extra contrast) */
+QLabel#camera_label {
+    border: 4px solid #333333;
+    background-color: black;
+}
+
+/* Greeting label (larger font, centered text) */
+QLabel#greeting_label {
+    font-size: 48px;
+    color: #FFFFFF;
+    background-color: rgba(0, 0, 0, 200);
+    padding: 20px;
+    border-radius: 15px;
+    qproperty-alignment: AlignCenter;
+}

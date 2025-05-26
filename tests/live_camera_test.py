@@ -1,3 +1,4 @@
+# /home/taran/self_discovery/tests/live_camera_test.py
 from picamera2 import Picamera2
 import cv2
 import numpy as np

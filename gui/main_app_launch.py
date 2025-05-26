@@ -36,6 +36,7 @@ import pytz
 class SmartMirrorApp(QMainWindow):
     def __init__(self):
         super().__init__()
+
         self.setWindowTitle("Smart Mirror")
         self.setGeometry(100, 100, 800, 600)
 
@@ -147,7 +148,7 @@ class SmartMirrorApp(QMainWindow):
         small_rgb = cv2.resize(rgb, (0, 0), fx=0.5, fy=0.5)
         self.frame_count += 1
 
-        if self.recognition_active and self.frame_count % 30 == 0:
+        if self.recognition_active and self.frame_count % 15 == 0:
             face_locations = face_recognition.face_locations(small_rgb)
             face_encodings = face_recognition.face_encodings(small_rgb, face_locations)
 
@@ -335,30 +336,19 @@ class SmartMirrorApp(QMainWindow):
         self.face_detector.close()
         event.accept()
 
+    def load_stylesheet(path):
+        try:
+            with open(path, "r") as f:
+                return f.read()
+        except FileNotFoundError:
+            print(f"⚠️ QSS file not found: {path}")
+            return ""
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyleSheet(
-        """
-        QWidget {
-            background-color: #121212;
-            color: #FFFFFF;
-        }
-        QLabel {
-            font-size: 14px;
-        }
-        QPushButton {
-            font-size: 14px;
-            padding: 6px 12px;
-            border-radius: 8px;
-            background-color: #2D2D2D;
-            color: #FFFFFF;
-        }
-        QPushButton:hover {
-            background-color: #3D3D3D;
-        }
-        """
-    )
+    qss = load_stylesheet("gui/themes/dark_theme.qss")
+    app.setStyleSheet(qss)
     window = SmartMirrorApp()
     window.show()
     sys.exit(app.exec_())
