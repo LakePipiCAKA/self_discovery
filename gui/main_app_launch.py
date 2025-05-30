@@ -65,7 +65,9 @@ class SmartMirrorApp(QMainWindow):
         self.layout.addWidget(self.switch_btn)
 
         self.camera = CameraInterface()
-        self.face_detector = HailoFaceDetector("/usr/share/hailo-models/yolov5s_personface_h8l.hef")
+        self.face_detector = HailoFaceDetector(
+            "/usr/share/hailo-models/yolov5s_personface_h8l.hef"
+        )
         self.users = load_profiles()
 
         self.timer = QTimer()
@@ -84,7 +86,12 @@ class SmartMirrorApp(QMainWindow):
         self.recognition_active = True
         self.snapshot_log = set()
         self.active_user = None
-        self.registration_prompts = ["Look straight ahead", "Look left", "Look right", "Smile"]
+        self.registration_prompts = [
+            "Look straight ahead",
+            "Look left",
+            "Look right",
+            "Smile",
+        ]
 
         if self.active_user:
             self.setup_btn.hide()
@@ -100,7 +107,9 @@ class SmartMirrorApp(QMainWindow):
                     location = geolocator.geocode(location_str)
                     if location:
                         tf = TimezoneFinder()
-                        timezone = tf.timezone_at(lng=location.longitude, lat=location.latitude)
+                        timezone = tf.timezone_at(
+                            lng=location.longitude, lat=location.latitude
+                        )
                     else:
                         timezone = "UTC"
                 except:
@@ -111,7 +120,9 @@ class SmartMirrorApp(QMainWindow):
         tz = pytz.timezone(timezone)
         now = datetime.now(tz).strftime("%H:%M:%S")
 
-        weather = get_weather(user_profile.get("location", {}) if user_profile else "default")
+        weather = get_weather(
+            user_profile.get("location", {}) if user_profile else "default"
+        )
         weather_text = f"{weather['location']}: {weather['temperature']}°F • {weather['condition']} • Wind {weather['wind']} mph"
 
         self.info_label.setText(f"Time: {now} | {weather_text}")
@@ -122,17 +133,28 @@ class SmartMirrorApp(QMainWindow):
             return
 
         frame = cv2.flip(frame, 1)
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb.shape
+        qt_img = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
+        self.camera_label.setPixmap(
+            QPixmap.fromImage(qt_img).scaled(800, 500, Qt.KeepAspectRatio)
+        )
 
         if self.in_registration:
-            prompt = self.registration_prompts[self.capture_count] if self.capture_count < len(self.registration_prompts) else ""
+            prompt = (
+                self.registration_prompts[self.capture_count]
+                if self.capture_count < len(self.registration_prompts)
+                else ""
+            )
             self.greeting_label.setText(f"{prompt} ({self.capture_count + 1}/4)")
 
             if self.capture_count < len(self.registration_prompts):
-                if not hasattr(self, "last_capture_time") or time.time() - self.last_capture_time > 2:
-                    self.capture_snapshot(frame)
-                    self.capture_count += 1
+                if not hasattr(self, "last_capture_time"):
                     self.last_capture_time = time.time()
-                return
+                elif time.time() - self.last_capture_time > 2:
+                    self.last_capture_time = time.time()
+                    QTimer.singleShot(10, lambda: self.capture_snapshot(frame))
+                    self.capture_count += 1
             else:
                 self.finish_registration()
                 return
@@ -153,7 +175,9 @@ class SmartMirrorApp(QMainWindow):
                     known_encs_np = np.array(known_encs)
                     if not known_encs_np.any():
                         continue
-                    distances = face_recognition.face_distance(known_encs_np, face_encoding)
+                    distances = face_recognition.face_distance(
+                        known_encs_np, face_encoding
+                    )
                     min_dist = np.min(distances)
                     if min_dist < 0.45 and min_dist < best_distance:
                         best_match = profile
@@ -163,17 +187,25 @@ class SmartMirrorApp(QMainWindow):
                     self.active_user = best_match
                     self.setup_btn.hide()
                     self.update_time()
-                    self.greeting_label.setText(f"🌞 Welcome back, {best_match['name']}!")
-                    print(f"✅ Recognized user: {best_match['name']} (distance: {best_distance:.2f})")
+                    self.greeting_label.setText(
+                        f"🌞 Welcome back, {best_match['name']}!"
+                    )
+                    print(
+                        f"✅ Recognized user: {best_match['name']} (distance: {best_distance:.2f})"
+                    )
                     self.recognition_active = False
                     self.capture_daily_snapshot(frame)
                     break
                 else:
-                    self.greeting_label.setText("😕 I don't recognize you yet. Want to add a profile?")
+                    self.greeting_label.setText(
+                        "😕 I don't recognize you yet. Want to add a profile?"
+                    )
 
         h, w, ch = rgb.shape
         qt_img = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
-        self.camera_label.setPixmap(QPixmap.fromImage(qt_img).scaled(800, 500, Qt.KeepAspectRatio))
+        self.camera_label.setPixmap(
+            QPixmap.fromImage(qt_img).scaled(800, 500, Qt.KeepAspectRatio)
+        )
 
     def begin_registration_sequence(self):
         dialog = ProfileDetailsDialog()
@@ -224,18 +256,20 @@ class SmartMirrorApp(QMainWindow):
         dists = np.linalg.norm(encs - mean_vec, axis=1)
         filtered_encs = encs[dists < 0.5]
 
-        profile.update({
-            "name": self.registration_data["name"],
-            "registered": True,
-            "location": self.registration_data["location"],
-            "date_of_birth": self.registration_data["dob"],
-            "sex": self.registration_data["sex"],
-            "facial_data": {
-                "encodings": filtered_encs.tolist(),
-                "training_images": self.registration_data["snapshots"]
-            },
-            "snapshots": self.registration_data["snapshots"]
-        })
+        profile.update(
+            {
+                "name": self.registration_data["name"],
+                "registered": True,
+                "location": self.registration_data["location"],
+                "date_of_birth": self.registration_data["dob"],
+                "sex": self.registration_data["sex"],
+                "facial_data": {
+                    "encodings": filtered_encs.tolist(),
+                    "training_images": self.registration_data["snapshots"],
+                },
+                "snapshots": self.registration_data["snapshots"],
+            }
+        )
 
         user_id = profile["name"].lower()
         save_profile(user_id, profile)
@@ -259,9 +293,13 @@ class SmartMirrorApp(QMainWindow):
         now = datetime.now()
         hour = now.hour
         period = (
-            "morning" if 5 <= hour < 12 else
-            "afternoon" if 12 <= hour < 17 else
-            "evening" if 17 <= hour < 21 else None
+            "morning"
+            if 5 <= hour < 12
+            else (
+                "afternoon"
+                if 12 <= hour < 17
+                else "evening" if 17 <= hour < 21 else None
+            )
         )
         if not period:
             return
@@ -273,7 +311,9 @@ class SmartMirrorApp(QMainWindow):
         user_id = self.active_user["name"].lower()
         folder = os.path.join("data", "users", user_id)
         os.makedirs(folder, exist_ok=True)
-        filename = os.path.join(folder, f"{now.strftime('%Y-%m-%d_%H%M%S')}_{period}.jpg")
+        filename = os.path.join(
+            folder, f"{now.strftime('%Y-%m-%d_%H%M%S')}_{period}.jpg"
+        )
         cv2.imwrite(filename, frame)
 
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -283,7 +323,9 @@ class SmartMirrorApp(QMainWindow):
             profile = self.active_user
             profile["facial_data"].setdefault("encodings", []).append(enc)
             if len(profile["facial_data"]["encodings"]) > 10:
-                profile["facial_data"]["encodings"] = profile["facial_data"]["encodings"][-10:]
+                profile["facial_data"]["encodings"] = profile["facial_data"][
+                    "encodings"
+                ][-10:]
             profile.setdefault("snapshots", []).append(filename)
             save_profile(user_id, profile)
             print(f"📸 Daily snapshot captured: {filename}")
@@ -293,6 +335,7 @@ class SmartMirrorApp(QMainWindow):
         # Save placeholder daily tip
         tips_path = os.path.join(folder, "daily_tips.json")
         import json
+
         try:
             with open(tips_path, "r") as f:
                 tips_data = json.load(f)
@@ -304,7 +347,6 @@ class SmartMirrorApp(QMainWindow):
             json.dump(tips_data, f, indent=2)
 
         print(f"📝 Saved daily tip placeholder for {now.date()} {period} time")
-
 
     def closeEvent(self, event):
         self.camera.stop()

@@ -1422,3 +1422,43 @@
 [2025-05-30 08:04:20.645] [63441] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
 [2025-05-30 08:04:20.660] [63441] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 21.229378 milliseconds
 [2025-05-30 08:04:20.660] [63441] [HailoRT] [info] [vdevice.cpp:749] [configure] Configuring HEF on VDevice took 21.5256 milliseconds
+[2025-05-30 08:29:52.306] [64382] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2025-05-30 08:29:52.319] [64382] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-05-30 08:29:52.321] [64382] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-05-30 08:29:52.321] [64382] [HailoRT] [info] [vdevice.cpp:651] [create] VDevice Infos: 0001:01:00.0
+[2025-05-30 08:29:52.464] [64382] [HailoRT] [info] [internal_buffer_manager.cpp:204] [print_execution_results] Planned internal buffer memory: CMA memory 0, user memory 1969664. memory to edge layer usage factor is 1
+[2025-05-30 08:29:52.464] [64382] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
+[2025-05-30 08:29:52.487] [64382] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 30.85076 milliseconds
+[2025-05-30 08:29:52.487] [64382] [HailoRT] [info] [vdevice.cpp:749] [configure] Configuring HEF on VDevice took 31.25954 milliseconds
+[2025-05-30 08:31:29.541] [64506] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2025-05-30 08:31:29.551] [64506] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-05-30 08:31:29.553] [64506] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-05-30 08:31:29.553] [64506] [HailoRT] [info] [vdevice.cpp:651] [create] VDevice Infos: 0001:01:00.0
+[2025-05-30 08:31:29.677] [64506] [HailoRT] [info] [internal_buffer_manager.cpp:204] [print_execution_results] Planned internal buffer memory: CMA memory 0, user memory 1969664. memory to edge layer usage factor is 1
+[2025-05-30 08:31:29.677] [64506] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
+[2025-05-30 08:31:29.693] [64506] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 22.652742 milliseconds
+[2025-05-30 08:31:29.693] [64506] [HailoRT] [info] [vdevice.cpp:749] [configure] Configuring HEF on VDevice took 22.94865 milliseconds
+[2025-05-30 08:37:04.525] [64845] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2025-05-30 08:37:04.535] [64845] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-05-30 08:37:04.537] [64845] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-05-30 08:37:04.537] [64845] [HailoRT] [info] [vdevice.cpp:651] [create] VDevice Infos: 0001:01:00.0
+[2025-05-30 08:37:04.661] [64845] [HailoRT] [info] [internal_buffer_manager.cpp:204] [print_execution_results] Planned internal buffer memory: CMA memory 0, user memory 1969664. memory to edge layer usage factor is 1
+[2025-05-30 08:37:04.661] [64845] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
+[2025-05-30 08:37:04.677] [64845] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 22.268639 milliseconds
+[2025-05-30 08:37:04.677] [64845] [HailoRT] [info] [vdevice.cpp:749] [configure] Configuring HEF on VDevice took 22.566492 milliseconds
+[2025-05-30 08:39:57.791] [64995] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2025-05-30 08:39:57.803] [64995] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-05-30 08:39:57.805] [64995] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-05-30 08:39:57.805] [64995] [HailoRT] [info] [vdevice.cpp:651] [create] VDevice Infos: 0001:01:00.0
+[2025-05-30 08:39:57.948] [64995] [HailoRT] [info] [internal_buffer_manager.cpp:204] [print_execution_results] Planned internal buffer memory: CMA memory 0, user memory 1969664. memory to edge layer usage factor is 1
+[2025-05-30 08:39:57.948] [64995] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
+[2025-05-30 08:39:57.972] [64995] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 31.053189 milliseconds
+[2025-05-30 08:39:57.972] [64995] [HailoRT] [info] [vdevice.cpp:749] [configure] Configuring HEF on VDevice took 31.443968 milliseconds
+[2025-05-30 08:42:15.162] [65192] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2025-05-30 08:42:15.175] [65192] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-05-30 08:42:15.176] [65192] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-05-30 08:42:15.176] [65192] [HailoRT] [info] [vdevice.cpp:651] [create] VDevice Infos: 0001:01:00.0
+[2025-05-30 08:42:15.308] [65192] [HailoRT] [info] [internal_buffer_manager.cpp:204] [print_execution_results] Planned internal buffer memory: CMA memory 0, user memory 1969664. memory to edge layer usage factor is 1
+[2025-05-30 08:42:15.308] [65192] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
+[2025-05-30 08:42:15.342] [65192] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 43.061397 milliseconds
+[2025-05-30 08:42:15.342] [65192] [HailoRT] [info] [vdevice.cpp:749] [configure] Configuring HEF on VDevice took 43.408861 milliseconds
